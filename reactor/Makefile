@@ -5,6 +5,8 @@ CSHARED = -shared
 test: test.o select_demultiplexer.o reactor.o tnet.o timer_pool.o
 	$(CC) $(CFLAGS) -o $@ $^
 
+
+
 %.o: %.c*
 	$(CC) $(CFLAGS) -c $<
 
@@ -17,3 +19,9 @@ clean:
 
 test_timer: test_timer.o timer_pool.o
 	$(CC) $(CFLAGS) -o $@ $^
+
+libreactor.so: reactor.o timer_pool.o select_demultiplexer.o
+	$(CC) $(CFLAGS) $(CSHARED) -o $@ $^
+
+.PHONY: shared
+shared: libreactor.so

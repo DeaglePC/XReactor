@@ -63,9 +63,18 @@ void Reactor::removeFileEvent(int fd, int mask)
 
 int Reactor::processEvents(int flag)
 {
-    int ret;
+    if (!(flag & EVENT_LOOP_FILE_EVENT) && !(flag & EVENT_LOOP_TIMER_EVENT))
+        return 0;
+
+    int ret, processed = 0;
     struct timeval tv, *tvp;
-    TimeEvent teShortest = m_timePool.getNearestTimer();
+    TimeEvent teShortest;
+    teShortest.id = -1;
+    if ((flag & EVENT_LOOP_TIMER_EVENT) && !(flag & EVENT_LOOP_DONT_WAIT))
+    {
+        teShortest = m_timePool.getNearestTimer();
+    }
+
     if (teShortest.id != -1)
     {
         long now_sec, now_ms;
@@ -120,21 +129,27 @@ int Reactor::processEvents(int flag)
         if (mask & EVENT_READABLE)
         {
             m_fileEvents[fd].rFileProc(fd, mask);
+            processed++;
         }
         if (mask & EVENT_WRITABLE)
         {
             m_fileEvents[fd].wFileProc(fd, mask);
+            processed++;
         }
     }
 
-    m_timePool.processTimeEvents();
+    if (flag & EVENT_LOOP_TIMER_EVENT)
+    {
+        processed += m_timePool.processTimeEvents();
+    }
+    return processed;
 }
 
-void Reactor::eventLoop()
+void Reactor::eventLoop(int flag)
 {
     while (!m_isStopLoop)
     {
-        processEvents(EVENT_LOOP_DONT_WAIT);
+        processEvents(flag);
     }
 }
 

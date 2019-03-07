@@ -49,7 +49,7 @@ int TimerPool::deleteTimeEvent(long long id)
 {
     for (auto it = m_timeEvents.begin(); it != m_timeEvents.end(); it++)
     {
-        if(it->id == id)
+        if (it->id == id)
         {
             m_timeEvents.erase(it);
             return TIMER_OK;
@@ -80,9 +80,8 @@ int TimerPool::processTimeEvents()
     time_t now = time(NULL);
 
     /* 上次处理的时间一定是比这次的时间戳小的，
-     * 处理一种情况是把系统时间调的很大，然后又调正确的情况，
-     * 就会出现这样的情况 */
-    if(now < m_lastTime)
+     * 处理一种情况是把系统时间调的很大，然后又调正确 */
+    if (now < m_lastTime)
     {
         for (auto it = m_timeEvents.begin(); it != m_timeEvents.end(); it++)
         {

@@ -137,7 +137,7 @@ int main(int argc, char const *argv[])
     id1 = pReactor->registTimeEvent(1000, time_proc1);
     id3 = pReactor->registTimeEvent(2000, time_proc3);
     printf("regist done!\n");
-    pReactor->eventLoop();
+    pReactor->eventLoop(EVENT_LOOP_FILE_EVENT | EVENT_LOOP_TIMER_EVENT);
     delete pReactor;
     return 0;
 }

@@ -8,6 +8,9 @@
 #include <map>
 
 #define EVENT_LOOP_DONT_WAIT 1
+#define EVENT_LOOP_FILE_EVENT 2
+#define EVENT_LOOP_TIMER_EVENT 4
+#define EVENT_LOOP_ALL_EVENT (EVENT_LOOP_FILE_EVENT | EVENT_LOOP_TIMER_EVENT)
 
 class Reactor
 {
@@ -25,7 +28,7 @@ public:
   Reactor();
   ~Reactor();
 
-  void eventLoop();
+  void eventLoop(int flag);
 
   void registFileEvent(int fd, int mask, FileProc proc);
   void removeFileEvent(int fd, int mask);
