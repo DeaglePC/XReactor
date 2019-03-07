@@ -14,12 +14,11 @@ struct FiredEvent
 {
     int fd;
     int mask;
-    FiredEvent(int _fd=-1, int _mask=0): fd(_fd), mask(_mask) {}
+    FiredEvent(int _fd = -1, int _mask = 0) : fd(_fd), mask(_mask) {}
 };
 
 using FiredEvents = std::vector<FiredEvent>;
 using FileProc = std::function<void(int fd, int mask)>;
-
 
 struct FileEvent
 {

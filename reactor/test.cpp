@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-
 Reactor *pReactor;
 
 int generic_accept(int fd, struct sockaddr *sa, socklen_t *len)
@@ -55,16 +54,16 @@ void read_proc(int fd, int mask)
 {
     char buf[1024];
     int ret = recv(fd, buf, 1024, 0);
-    if(ret == 0)
+    if (ret == 0)
     {
         printf("client gone!\n");
-        pReactor->removeEvent(fd, EVENT_READABLE | EVENT_WRITABLE);
+        pReactor->removeFileEvent(fd, EVENT_READABLE | EVENT_WRITABLE);
     }
-    else if(ret == -1)
+    else if (ret == -1)
     {
         printf("recv err\n");
     }
-    else if(ret > 0)
+    else if (ret > 0)
     {
         printf("recv: %s\n", buf);
         send(fd, buf, ret, 0);
@@ -79,7 +78,7 @@ void accept_proc(int fd, int mask)
     if (ret != -1)
     {
         printf("client come here!%s: %d\n", ip, port);
-        pReactor->registEvent(ret, EVENT_READABLE, read_proc);
+        pReactor->registFileEvent(ret, EVENT_READABLE, read_proc);
     }
     else
     {
@@ -87,12 +86,56 @@ void accept_proc(int fd, int mask)
     }
 }
 
+long long id1, id2, id3;
+int time_proc2(long long id);
+int time_proc1(long long id)
+{
+    static int cnt = 0;
+    printf("#wdnmd!: -%d- \n", ++cnt);
+    if (cnt == 10)
+    {
+        id2 = pReactor->registTimeEvent(1000, time_proc2);
+    }
+    if (cnt == 15)
+    {
+        int ret = pReactor->removeTimeEvent(id2);
+        if (ret != -1)
+        {
+            printf("#deleted: \n");
+        }
+        else
+        {
+            printf("#delete err not found id\n");
+        }
+        
+    }
+    if (cnt == 20)
+    {
+        return -1;
+    }
+    return 1000;
+}
+
+int time_proc2(long long id)
+{
+    printf("#qzzzzz!\n");
+    return 1000;
+}
+
+int time_proc3(long long id)
+{
+    printf("#hello world\n");
+    return 2000;
+}
+
 int main(int argc, char const *argv[])
 {
     int serverfd = tnet::tcp_socket();
     int ret = tnet::tcp_listen(serverfd, 10086);
     pReactor = new Reactor;
-    pReactor->registEvent(serverfd, EVENT_READABLE, accept_proc);
+    pReactor->registFileEvent(serverfd, EVENT_READABLE, accept_proc);
+    id1 = pReactor->registTimeEvent(1000, time_proc1);
+    id3 = pReactor->registTimeEvent(2000, time_proc3);
     printf("regist done!\n");
     pReactor->eventLoop();
     delete pReactor;
