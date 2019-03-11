@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string.h>
 
 Reactor *pReactor;
 
@@ -50,6 +51,12 @@ int server_accept(int fd, char *ip, size_t ip_len, int *port)
     return ret;
 }
 
+void write_proc(int fd, int mask)
+{
+    printf("wwwwwwwwwww\n");
+    pReactor->removeFileEvent(fd, EVENT_WRITABLE);
+}
+
 void read_proc(int fd, int mask)
 {
     char buf[1024];
@@ -66,6 +73,20 @@ void read_proc(int fd, int mask)
     else if (ret > 0)
     {
         printf("recv: %s\n", buf);
+        if(ret > 3)
+        {
+            buf[3] = '\0';
+            if(strcmp(buf, "666") == 0)
+            {
+                pReactor->removeFileEvent(fd, EVENT_WRITABLE);
+                return;
+            }
+            if(strcmp(buf, "123") == 0)
+            {
+                pReactor->registFileEvent(fd, EVENT_WRITABLE, write_proc);
+                return;
+            }
+        }
         send(fd, buf, ret, 0);
     }
 }

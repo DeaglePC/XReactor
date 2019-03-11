@@ -11,7 +11,7 @@ SelectDemultiplexer::~SelectDemultiplexer()
 {
 }
 
-void SelectDemultiplexer::addEvent(int fd, int mask)
+void SelectDemultiplexer::addEvent(const EventHandlerMap& fileEvents, int fd, int mask)
 {
     if (mask & EVENT_READABLE)
     {
@@ -23,7 +23,7 @@ void SelectDemultiplexer::addEvent(int fd, int mask)
     }
 }
 
-void SelectDemultiplexer::delEvent(int fd, int mask)
+void SelectDemultiplexer::delEvent(const EventHandlerMap& fileEvents, int fd, int mask)
 {
     if (mask & EVENT_READABLE)
     {
@@ -35,7 +35,7 @@ void SelectDemultiplexer::delEvent(int fd, int mask)
     }
 }
 
-int SelectDemultiplexer::pollEvent(const std::map<int, FileEvent> &fileEvents, FiredEvents &fired_events, timeval *tvp)
+int SelectDemultiplexer::pollEvent(const std::map<int, FileEvent> &fileEvents, FiredEvents &firedEvents, timeval *tvp)
 {
     int max_fd = fileEvents.rbegin()->first + 1;
     memcpy(&m_tmp_rfds, &m_rfds, sizeof(fd_set));
@@ -53,9 +53,9 @@ int SelectDemultiplexer::pollEvent(const std::map<int, FileEvent> &fileEvents, F
     int fd, mask;
     int index = 0;
     // 避免频繁分配内存
-    if(fired_events.capacity() < num)
+    if(firedEvents.capacity() < num)
     {
-        fired_events.resize(num);
+        firedEvents.resize(num);
     }
     for (auto it = fileEvents.begin(); it != fileEvents.end(); it++)
     {
@@ -74,7 +74,7 @@ int SelectDemultiplexer::pollEvent(const std::map<int, FileEvent> &fileEvents, F
         {
             continue;
         }
-        fired_events[index++] = FiredEvent(fd, tmpMask);
+        firedEvents[index++] = FiredEvent(fd, tmpMask);
     }
     return index;
 }

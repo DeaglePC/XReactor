@@ -25,6 +25,7 @@ struct FileEvent
     int mask;
     FileProc wFileProc;
     FileProc rFileProc;
+    FileEvent(int _mask = 0): mask(_mask){}
 };
 using EventHandlerMap = std::map<int, FileEvent>;
 

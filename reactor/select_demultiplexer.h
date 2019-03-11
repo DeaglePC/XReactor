@@ -7,18 +7,19 @@
 class SelectDemultiplexer : public EventDemultiplexer
 {
 public:
-    SelectDemultiplexer();
-    virtual ~SelectDemultiplexer();
+  SelectDemultiplexer();
+  virtual ~SelectDemultiplexer();
 
-    virtual void addEvent(int fd, int mask);
-    virtual void delEvent(int fd, int mask);
-    virtual int pollEvent(const EventHandlerMap& fileEvents, FiredEvents &fired_events, timeval *tvp);
+  virtual void addEvent(const EventHandlerMap& fileEvents, int fd, int mask);
+  virtual void delEvent(const EventHandlerMap& fileEvents, int fd, int mask);
+  virtual int pollEvent(const EventHandlerMap &fileEvents,
+                        FiredEvents &firedEvents, timeval *tvp);
 
 private:
-    fd_set m_rfds;
-    fd_set m_wfds;
-    fd_set m_tmp_rfds;
-    fd_set m_tmp_wfds;
+  fd_set m_rfds;
+  fd_set m_wfds;
+  fd_set m_tmp_rfds;
+  fd_set m_tmp_wfds;
 };
 
 #endif // __SELECT_DEMULTIPLEXER_H__

@@ -3,7 +3,11 @@
 
 #include "event.h"
 #include "event_demultiplexer.h"
+#ifdef __linux__
+#include "epoll_demultiplexer.h"
+#else
 #include "select_demultiplexer.h"
+#endif // __linux__
 #include "timer_pool.h"
 #include <map>
 

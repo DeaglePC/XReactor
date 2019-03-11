@@ -3,7 +3,11 @@
 
 Reactor::Reactor() : m_demultiplexer(nullptr), m_isStopLoop(false)
 {
+#ifdef __linux__
+    m_demultiplexer = new EpollDemultiplexer;
+#else
     m_demultiplexer = new SelectDemultiplexer;
+#endif // __linux__
 }
 
 Reactor::~Reactor()
@@ -16,6 +20,7 @@ Reactor::~Reactor()
 
 void Reactor::registFileEvent(int fd, int mask, FileProc proc)
 {
+    m_demultiplexer->addEvent(m_fileEvents, fd, mask);
     auto it = m_fileEvents.find(fd);
     if (it == m_fileEvents.end())
     {
@@ -43,11 +48,11 @@ void Reactor::registFileEvent(int fd, int mask, FileProc proc)
             it->second.wFileProc = proc;
         }
     }
-    m_demultiplexer->addEvent(fd, mask);
 }
 
 void Reactor::removeFileEvent(int fd, int mask)
 {
+    m_demultiplexer->delEvent(m_fileEvents, fd, mask);
     auto it = m_fileEvents.find(fd);
     if (it == m_fileEvents.end())
     {
@@ -58,7 +63,6 @@ void Reactor::removeFileEvent(int fd, int mask)
     {
         m_fileEvents.erase(it);
     }
-    m_demultiplexer->delEvent(fd, mask);
 }
 
 int Reactor::processEvents(int flag)
