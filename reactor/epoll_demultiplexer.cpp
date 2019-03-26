@@ -18,8 +18,12 @@ void EpollDemultiplexer::addEvent(const EventHandlerMap &fileEvents,
     if (it == fileEvents.end())
     {
         op = EPOLL_CTL_ADD;
+    }
+    else
+    {
         mask |= it->second.mask;
     }
+    
     struct epoll_event ee = {0};
     ee.events = 0;
     

@@ -19,7 +19,7 @@ void SelectDemultiplexer::addEvent(const EventHandlerMap& fileEvents, int fd, in
     }
     if (mask & EVENT_WRITABLE)
     {
-        FD_SET(fd, &m_rfds);
+        FD_SET(fd, &m_wfds);
     }
 }
 
@@ -31,7 +31,7 @@ void SelectDemultiplexer::delEvent(const EventHandlerMap& fileEvents, int fd, in
     }
     if (mask & EVENT_WRITABLE)
     {
-        FD_CLR(fd, &m_rfds);
+        FD_CLR(fd, &m_wfds);
     }
 }
 
